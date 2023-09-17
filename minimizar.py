@@ -9,7 +9,7 @@ class Transicao:
         self.destino = destino
 
     def __repr__(self) -> str:
-        return f"[{self.origem}, {self.simbolo}, {self.destino}]"
+        return f"{self.origem},{self.simbolo},{self.destino}"
 
 def obter_elementos(texto):
     return [i for i in texto if i != '{' and i != '}' and i != ',']
@@ -89,7 +89,14 @@ def remover_equivalentes(estados, estados_finais, transicoes):
                 if transicao.destino == estado:
                     transicao.destino = classe[0]
             lista_estados.remove(estado)
+            estados_finais.remove(estado)
     return set(lista_estados)
+
+def formatar_transicoes(transicoes):
+    set_aux = set()
+    for i in transicoes:
+        set_aux.add(str(i))
+    return list(set_aux)
 
 def ler():
     entrada = input()
@@ -104,8 +111,11 @@ def ler():
     estados = remover_inalcancaveis(estado_inicial, transicoes)
     estados = remover_mortos(estados_finais, transicoes)
     estados = remover_equivalentes(estados, estados_finais, transicoes)
-    print(estados)
-    print(transicoes)
+
+    transicoes_str = formatar_transicoes(transicoes)
+    transicoes_str.sort()
+    num_estados = len(estados)
+    print(f"{num_estados};{estado_inicial};{{{','.join(estados_finais)}}};{{{','.join(alfabeto)}}};{';'.join(transicoes_str)}")
 
 ler()
 # print(obter_elementos("{a,b,cde}"))
