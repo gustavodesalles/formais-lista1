@@ -62,24 +62,34 @@ def remover_mortos(estados_finais, transicoes):
     return set(vivos)
 
 def determinar_classes_equivalencia(estados, estados_finais, transicoes):
-    k_menos_f = [estados.difference(estados_finais)]
+    k_menos_f = list(estados.difference(estados_finais))
     f = estados_finais
     classes_equivalencia = [k_menos_f, f]
     while True:
         dicionario_classes = dict()
         for estado in estados:
             lista_num_classe = obter_classes_transicoes_estado(obter_transicoes_estado(estado, transicoes), classes_equivalencia)
-            dicionario_classes.setdefault(lista_num_classe, []).append(estado)
+            dicionario_classes.setdefault(tuple(lista_num_classe), []).append(estado)
         lista_classes = list(dicionario_classes.values())
-        if set(lista_classes) == set(classes_equivalencia):
+        lista_classes.sort()
+        classes_equivalencia.sort()
+        if lista_classes == classes_equivalencia:
             return lista_classes
         classes_equivalencia = lista_classes.copy()
 
 def remover_equivalentes(estados, estados_finais, transicoes):
     lista_classes_equivalentes = determinar_classes_equivalencia(estados, estados_finais, transicoes)
+    lista_estados = list(estados)
     for classe in lista_classes_equivalentes:
         classe.sort()
-        estado_superior = classe[0]
+        for estado in classe[1:]:
+            for transicao in transicoes:
+                if transicao.origem == estado:
+                    transicao.origem = classe[0]
+                if transicao.destino == estado:
+                    transicao.destino = classe[0]
+            lista_estados.remove(estado)
+    return set(lista_estados)
 
 def ler():
     entrada = input()
@@ -93,6 +103,7 @@ def ler():
 
     estados = remover_inalcancaveis(estado_inicial, transicoes)
     estados = remover_mortos(estados_finais, transicoes)
+    estados = remover_equivalentes(estados, estados_finais, transicoes)
     print(estados)
     print(transicoes)
 
