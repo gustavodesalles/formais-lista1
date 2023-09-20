@@ -89,7 +89,8 @@ def remover_equivalentes(estados, estados_finais, transicoes):
                 if transicao.destino == estado:
                     transicao.destino = classe[0]
             lista_estados.remove(estado)
-            estados_finais.remove(estado)
+            if estado in estados_finais:
+                estados_finais.remove(estado)
     return set(lista_estados)
 
 def formatar_transicoes(transicoes):
